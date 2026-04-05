@@ -1,0 +1,5 @@
+export const FINANCE_STORAGE_KEY = 'finance-app:v1'
+export const DEFAULT_MONTHLY_BUDGET_LIMIT = 2500
+export const DEFAULT_WARNING_THRESHOLD = 0.85
+export const RECENT_TRANSACTIONS_LIMIT = 5
+export const UPCOMING_RECURRING_LIMIT = 5

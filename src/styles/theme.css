@@ -1,0 +1,92 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+:root {
+  --app-bg: #f4f8fc;
+  --panel: #ffffff;
+  --panel-muted: #eef4fa;
+  --outline: #dbe5f0;
+  --text-primary: #10233c;
+  --text-secondary: #4f647f;
+  --text-muted: #7e92ac;
+  --brand: #176eff;
+  --brand-strong: #0959d8;
+  --brand-soft: #e7f0ff;
+  --success: #0f9f75;
+  --success-soft: #ddf7ee;
+  --danger: #e05252;
+  --danger-soft: #ffe5e5;
+  --warning: #d08b11;
+  --warning-soft: #fff4d6;
+}
+
+[data-theme='dark'] {
+  --app-bg: #07111f;
+  --panel: #0d1a2b;
+  --panel-muted: #132338;
+  --outline: #22344c;
+  --text-primary: #edf4ff;
+  --text-secondary: #bdd0e6;
+  --text-muted: #7b91ae;
+  --brand: #62a0ff;
+  --brand-strong: #8ab8ff;
+  --brand-soft: rgba(98, 160, 255, 0.16);
+  --success: #43c59c;
+  --success-soft: rgba(67, 197, 156, 0.18);
+  --danger: #ff7a7a;
+  --danger-soft: rgba(255, 122, 122, 0.16);
+  --warning: #f5be57;
+  --warning-soft: rgba(245, 190, 87, 0.14);
+}
+
+@theme inline {
+  --font-sans: "Manrope", "Segoe UI", sans-serif;
+  --color-app-bg: var(--app-bg);
+  --color-panel: var(--panel);
+  --color-panel-muted: var(--panel-muted);
+  --color-outline: var(--outline);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --shadow-card: 0 25px 60px -36px rgba(15, 23, 42, 0.35);
+  --shadow-glow: 0 24px 52px -24px rgba(23, 110, 255, 0.6);
+}
+
+@layer base {
+  * {
+    border-color: var(--outline);
+  }
+
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--app-bg);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--text-muted);
+  }
+
+  ::selection {
+    background: rgba(23, 110, 255, 0.22);
+  }
+}
