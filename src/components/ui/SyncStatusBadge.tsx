@@ -6,38 +6,73 @@ import type { FinanceSyncState } from '@/types/finance'
 interface SyncStatusBadgeProps {
   syncState: FinanceSyncState
   showMessage?: boolean
+  compact?: boolean
 }
 
-export function SyncStatusBadge({ showMessage = true, syncState }: SyncStatusBadgeProps) {
-  const Icon =
-    syncState.mode === 'local'
-      ? syncState.phase === 'error'
-        ? CloudAlert
-        : DatabaseZap
-      : syncState.phase === 'loading'
-        ? LoaderCircle
-        : syncState.phase === 'saving'
-          ? RefreshCw
-          : syncState.phase === 'error'
-            ? CloudAlert
-            : CloudCheck
+function getSyncStatusMeta(syncState: FinanceSyncState) {
+  if (syncState.mode === 'local') {
+    if (syncState.phase === 'error') {
+      return {
+        icon: CloudAlert,
+        label: 'Revisar conexion',
+        variant: 'danger' as const,
+      }
+    }
 
-  const variant =
-    syncState.phase === 'error'
-      ? 'danger'
-      : syncState.mode === 'local'
-        ? 'neutral'
-        : syncState.phase === 'saving' || syncState.phase === 'loading'
-          ? 'warning'
-          : 'success'
+    return {
+      icon: DatabaseZap,
+      label: 'Modo local',
+      variant: 'neutral' as const,
+    }
+  }
+
+  if (syncState.phase === 'loading') {
+    return {
+      icon: LoaderCircle,
+      label: 'Sincronizando',
+      variant: 'warning' as const,
+    }
+  }
+
+  if (syncState.phase === 'saving') {
+    return {
+      icon: RefreshCw,
+      label: 'Guardando',
+      variant: 'warning' as const,
+    }
+  }
+
+  if (syncState.phase === 'error') {
+    return {
+      icon: CloudAlert,
+      label: 'Revisar conexion',
+      variant: 'danger' as const,
+    }
+  }
+
+  return {
+    icon: CloudCheck,
+    label: 'Con respaldo',
+    variant: 'success' as const,
+  }
+}
+
+export function SyncStatusBadge({ showMessage = true, compact = false, syncState }: SyncStatusBadgeProps) {
+  const statusMeta = getSyncStatusMeta(syncState)
+  const Icon = statusMeta.icon
+  const isBusy = syncState.phase === 'loading' || syncState.phase === 'saving'
 
   return (
-    <div className="flex items-center gap-3">
-      <Badge className="gap-2 px-3 py-2 text-xs" variant={variant}>
-        <Icon className={`h-3.5 w-3.5 ${syncState.phase === 'loading' || syncState.phase === 'saving' ? 'animate-spin' : ''}`} />
-        {syncState.mode === 'supabase' ? 'Cuenta' : 'Local'}
+    <div className={compact ? 'flex items-center gap-2' : 'flex items-center gap-3'}>
+      <Badge className={compact ? 'gap-2 px-2.5 py-1.5 text-[0.7rem]' : 'gap-2 px-3 py-2 text-xs'} variant={statusMeta.variant}>
+        <Icon className={`h-3.5 w-3.5 ${isBusy ? 'animate-spin' : ''}`} />
+        {statusMeta.label}
       </Badge>
-      {showMessage ? <p className="hidden text-sm text-text-secondary xl:block">{syncState.message}</p> : null}
+      {showMessage ? (
+        <p className={`${compact ? 'text-xs' : 'hidden text-sm lg:block'} text-text-secondary`}>
+          {syncState.message}
+        </p>
+      ) : null}
     </div>
   )
 }

@@ -35,12 +35,12 @@ export function UpcomingRecurringCard({ categories, currency, rules }: UpcomingR
 
   return (
     <Card className="h-full">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-text-muted">Programados</p>
           <h2 className="mt-2 text-2xl font-bold tracking-tight text-text-primary">Proximas ejecuciones</h2>
         </div>
-        <Link className={cn(buttonStyles({ variant: 'secondary', size: 'sm' }))} to="/programados">
+        <Link className={cn(buttonStyles({ variant: 'secondary', size: 'sm' }), 'w-full sm:w-auto')} to="/programados">
           Gestionar
         </Link>
       </div>
@@ -52,16 +52,16 @@ export function UpcomingRecurringCard({ categories, currency, rules }: UpcomingR
           return (
             <div key={rule.id} className="rounded-[1.4rem] border border-outline bg-panel-muted p-4">
               <div className="flex items-start justify-between gap-4">
-                <div>
+                <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-text-primary">{rule.description}</p>
+                    <p className="truncate font-semibold text-text-primary">{rule.description}</p>
                     {rule.isFixed ? <Badge variant="warning">Fijo</Badge> : null}
                   </div>
                   <p className="mt-1 text-sm text-text-secondary">
                     {category?.label ?? 'Categoria'} · {rule.nextRunAt ? formatDisplayDateTime(rule.nextRunAt) : 'Sin fecha'}
                   </p>
                 </div>
-                <p className={cn('font-semibold', rule.type === 'income' ? 'text-success' : 'text-danger')}>
+                <p className={cn('shrink-0 font-semibold', rule.type === 'income' ? 'text-success' : 'text-danger')}>
                   {rule.type === 'income' ? '+' : '-'}
                   {formatCurrency(rule.amount, currency)}
                 </p>

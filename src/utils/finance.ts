@@ -79,6 +79,10 @@ export function createInitialFinanceState(referenceDate = new Date()): FinanceSt
   return {
     transactions: [],
     recurringRules: [],
+    debts: [],
+    debtPayments: [],
+    salaryProfile: null,
+    salaryDeductions: [],
     categories: defaultCategories,
     filters: createInitialFilters(),
     monthlyBudget: createDefaultBudget(referenceDate),

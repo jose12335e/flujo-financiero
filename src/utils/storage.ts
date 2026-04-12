@@ -18,9 +18,10 @@ const transactionSchema = z.object({
   date: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  source: z.enum(['manual', 'recurring']).optional(),
+  source: z.enum(['manual', 'recurring', 'debt_payment', 'salary_payment']).optional(),
   recurringRuleId: z.string().nullable().optional(),
   scheduledFor: z.string().nullable().optional(),
+  debtId: z.string().nullable().optional(),
 })
 
 const recurringRuleSchema = z.object({
@@ -52,9 +53,70 @@ const categorySchema = z.object({
   isDefault: z.boolean(),
 })
 
+const debtSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.enum(['loan', 'credit_card', 'mortgage', 'vehicle', 'service', 'personal', 'other']),
+  originalAmount: z.number().nonnegative(),
+  pendingBalance: z.number().nonnegative(),
+  monthlyPayment: z.number().nonnegative(),
+  interestRate: z.number().nonnegative().nullable(),
+  paymentDay: z.number().int().min(1).max(31),
+  startDate: z.string(),
+  endDate: z.string().nullable(),
+  status: z.enum(['active', 'paid', 'paused', 'defaulted']),
+  priority: z.enum(['low', 'medium', 'high', 'critical']),
+  notes: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+})
+
+const debtPaymentSchema = z.object({
+  id: z.string(),
+  debtId: z.string(),
+  transactionId: z.string().nullable(),
+  amount: z.number().nonnegative(),
+  paymentDate: z.string(),
+  principalAmount: z.number().nonnegative().nullable(),
+  interestAmount: z.number().nonnegative().nullable(),
+  notes: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+})
+
+const salaryProfileSchema = z.object({
+  id: z.string(),
+  grossSalary: z.number().nonnegative(),
+  payFrequency: z.enum(['monthly', 'biweekly', 'weekly']),
+  bonuses: z.number().nonnegative(),
+  overtimePay: z.number().nonnegative(),
+  otherIncome: z.number().nonnegative(),
+  notes: z.string(),
+  allowTransactionGeneration: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+})
+
+const salaryDeductionSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.enum(['fixed', 'percentage']),
+  value: z.number().nonnegative(),
+  isActive: z.boolean(),
+  isMandatory: z.boolean(),
+  frequency: z.enum(['per_period', 'monthly']),
+  notes: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+})
+
 const financeStateSchema = z.object({
   transactions: z.array(transactionSchema),
   recurringRules: z.array(recurringRuleSchema).optional(),
+  debts: z.array(debtSchema).optional(),
+  debtPayments: z.array(debtPaymentSchema).optional(),
+  salaryProfile: salaryProfileSchema.nullable().optional(),
+  salaryDeductions: z.array(salaryDeductionSchema).optional(),
   categories: z.array(categorySchema),
   filters: z
     .object({
@@ -93,8 +155,13 @@ export function deserializeFinanceState(raw: string | null): FinanceState {
         source: transaction.source ?? 'manual',
         recurringRuleId: transaction.recurringRuleId ?? null,
         scheduledFor: transaction.scheduledFor ?? null,
+        debtId: transaction.debtId ?? null,
       })),
       recurringRules: parsed.recurringRules ?? [],
+      debts: parsed.debts ?? [],
+      debtPayments: parsed.debtPayments ?? [],
+      salaryProfile: parsed.salaryProfile ?? null,
+      salaryDeductions: parsed.salaryDeductions ?? [],
       categories: parsed.categories,
       filters: parsed.filters ?? createInitialFilters(),
       monthlyBudget: {

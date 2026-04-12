@@ -32,13 +32,13 @@ export function ReportsPage() {
         title="Reportes para entender tu comportamiento financiero"
       />
 
-      <div className="flex flex-col gap-4 rounded-[2rem] border border-outline bg-panel p-5 shadow-card sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-[1.7rem] border border-outline bg-panel p-4 shadow-card sm:rounded-[2rem] sm:p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-text-muted">Periodo</p>
           <h2 className="mt-2 text-2xl font-bold tracking-tight text-text-primary">{formatMonthLabel(selectedMonthKey)}</h2>
         </div>
         <select
-          className="min-h-12 rounded-2xl border border-outline bg-app-bg px-4 text-sm text-text-primary outline-none transition focus:border-brand focus:ring-2 focus:ring-brand"
+          className="min-h-12 w-full rounded-2xl border border-outline bg-app-bg px-4 text-sm text-text-primary outline-none transition focus:border-brand focus:ring-2 focus:ring-brand sm:w-auto"
           onChange={(event) => setRequestedMonthKey(event.target.value)}
           value={selectedMonthKey}
         >

@@ -32,9 +32,10 @@ export interface Database {
           category_id: string
           description: string
           date: string
-          source: 'manual' | 'recurring'
+          source: 'manual' | 'recurring' | 'debt_payment' | 'salary_payment'
           recurring_rule_id: string | null
           scheduled_for: string | null
+          debt_id: string | null
           created_at: string
           updated_at: string
         }
@@ -46,13 +47,144 @@ export interface Database {
           category_id: string
           description: string
           date: string
-          source?: 'manual' | 'recurring'
+          source?: 'manual' | 'recurring' | 'debt_payment' | 'salary_payment'
           recurring_rule_id?: string | null
           scheduled_for?: string | null
+          debt_id?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: Partial<Database['public']['Tables']['finance_transactions']['Insert']>
+        Relationships: []
+      }
+      finance_salary_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          gross_salary: number
+          pay_frequency: 'monthly' | 'biweekly' | 'weekly'
+          bonuses: number
+          overtime_pay: number
+          other_income: number
+          notes: string
+          allow_transaction_generation: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          user_id: string
+          gross_salary: number
+          pay_frequency: 'monthly' | 'biweekly' | 'weekly'
+          bonuses?: number
+          overtime_pay?: number
+          other_income?: number
+          notes?: string
+          allow_transaction_generation?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['finance_salary_profiles']['Insert']>
+        Relationships: []
+      }
+      finance_salary_deductions: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          type: 'fixed' | 'percentage'
+          value: number
+          is_active: boolean
+          is_mandatory: boolean
+          frequency: 'per_period' | 'monthly'
+          notes: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          user_id: string
+          name: string
+          type: 'fixed' | 'percentage'
+          value: number
+          is_active?: boolean
+          is_mandatory?: boolean
+          frequency: 'per_period' | 'monthly'
+          notes?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['finance_salary_deductions']['Insert']>
+        Relationships: []
+      }
+      finance_debts: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          type: 'loan' | 'credit_card' | 'mortgage' | 'vehicle' | 'service' | 'personal' | 'other'
+          original_amount: number
+          pending_balance: number
+          monthly_payment: number
+          interest_rate: number | null
+          payment_day: number
+          start_date: string
+          end_date: string | null
+          status: 'active' | 'paid' | 'paused' | 'defaulted'
+          priority: 'low' | 'medium' | 'high' | 'critical'
+          notes: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          user_id: string
+          name: string
+          type: 'loan' | 'credit_card' | 'mortgage' | 'vehicle' | 'service' | 'personal' | 'other'
+          original_amount: number
+          pending_balance: number
+          monthly_payment: number
+          interest_rate?: number | null
+          payment_day: number
+          start_date: string
+          end_date?: string | null
+          status: 'active' | 'paid' | 'paused' | 'defaulted'
+          priority: 'low' | 'medium' | 'high' | 'critical'
+          notes?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['finance_debts']['Insert']>
+        Relationships: []
+      }
+      finance_debt_payments: {
+        Row: {
+          id: string
+          user_id: string
+          debt_id: string
+          transaction_id: string | null
+          amount: number
+          payment_date: string
+          principal_amount: number | null
+          interest_amount: number | null
+          notes: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          user_id: string
+          debt_id: string
+          transaction_id?: string | null
+          amount: number
+          payment_date: string
+          principal_amount?: number | null
+          interest_amount?: number | null
+          notes?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['finance_debt_payments']['Insert']>
         Relationships: []
       }
       finance_recurring_rules: {

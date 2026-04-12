@@ -14,5 +14,6 @@ export const defaultCategories: Category[] = [
   { id: 'entertainment', type: 'expense', label: 'Ocio', color: '#ec4899', icon: 'Popcorn', isDefault: true },
   { id: 'services', type: 'expense', label: 'Servicios', color: '#64748b', icon: 'Wifi', isDefault: true },
   { id: 'shopping', type: 'expense', label: 'Compras', color: '#14b8a6', icon: 'ShoppingBag', isDefault: true },
+  { id: 'debt-payment', type: 'expense', label: 'Pago de deuda', color: '#8b5cf6', icon: 'CreditCard', isDefault: true },
   { id: 'other-expense', type: 'expense', label: 'Otros gastos', color: '#7c8aa0', icon: 'ReceiptText', isDefault: true },
 ]

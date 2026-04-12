@@ -16,6 +16,14 @@ const ScheduledPage = lazy(async () => ({
   default: (await import('@/features/recurring/pages/ScheduledPage')).ScheduledPage,
 }))
 
+const DebtsPage = lazy(async () => ({
+  default: (await import('@/features/debts/pages/DebtsPage')).DebtsPage,
+}))
+
+const SalaryPage = lazy(async () => ({
+  default: (await import('@/features/salary/pages/SalaryPage')).SalaryPage,
+}))
+
 const HistoryPage = lazy(async () => ({
   default: (await import('@/features/transactions/pages/HistoryPage')).HistoryPage,
 }))
@@ -74,6 +82,8 @@ export const router = createBrowserRouter([
       { path: 'registrar', element: withSuspense(<RegisterPage />) },
       { path: 'registrar/:transactionId', element: withSuspense(<RegisterPage />) },
       { path: 'programados', element: withSuspense(<ScheduledPage />) },
+      { path: 'deudas', element: withSuspense(<DebtsPage />) },
+      { path: 'salario', element: withSuspense(<SalaryPage />) },
       { path: 'historial', element: withSuspense(<HistoryPage />) },
       { path: 'reportes', element: withSuspense(<ReportsPage />) },
       { path: 'configuracion', element: withSuspense(<SettingsPage />) },

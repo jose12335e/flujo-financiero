@@ -113,9 +113,9 @@ export function RecurringRuleForm({
 
   return (
     <form className="space-y-6" onSubmit={form.handleSubmit((values) => onSubmit(values))}>
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 md:gap-5">
         <button
-          className={`rounded-[1.6rem] border p-4 text-left transition ${
+          className={`rounded-[1.4rem] border p-4 text-left transition sm:rounded-[1.6rem] ${
             currentType === 'expense'
               ? 'border-danger bg-danger-soft text-danger'
               : 'border-outline bg-panel-muted text-text-secondary hover:bg-app-bg'
@@ -131,7 +131,7 @@ export function RecurringRuleForm({
         </button>
 
         <button
-          className={`rounded-[1.6rem] border p-4 text-left transition ${
+          className={`rounded-[1.4rem] border p-4 text-left transition sm:rounded-[1.6rem] ${
             currentType === 'income'
               ? 'border-success bg-success-soft text-success'
               : 'border-outline bg-panel-muted text-text-secondary hover:bg-app-bg'
@@ -147,7 +147,7 @@ export function RecurringRuleForm({
         </button>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 md:gap-5">
         <label className="space-y-2">
           <span className="text-sm font-semibold text-text-primary">Monto</span>
           <input
@@ -184,7 +184,7 @@ export function RecurringRuleForm({
         <FieldError message={form.formState.errors.description?.message} />
       </label>
 
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 md:gap-5">
         <label className="space-y-2">
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-text-primary">
             <Repeat2 className="h-4 w-4 text-text-muted" />
@@ -221,7 +221,7 @@ export function RecurringRuleForm({
         </label>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3 md:gap-5">
         <label className="space-y-2">
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-text-primary">
             <CalendarDays className="h-4 w-4 text-text-muted" />
@@ -280,11 +280,11 @@ export function RecurringRuleForm({
 
       <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
         {onCancel ? (
-          <Button onClick={onCancel} type="button" variant="secondary">
+          <Button className="w-full sm:w-auto" onClick={onCancel} type="button" variant="secondary">
             Cancelar
           </Button>
         ) : null}
-        <Button fullWidth={false} size="lg" type="submit">
+        <Button className="w-full sm:w-auto" fullWidth={false} size="lg" type="submit">
           {isEditing ? 'Guardar programacion' : 'Crear programacion'}
         </Button>
       </div>

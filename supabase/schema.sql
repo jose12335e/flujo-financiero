@@ -39,7 +39,69 @@ create table if not exists public.finance_transactions (
 alter table public.finance_transactions
   add column if not exists source text not null default 'manual',
   add column if not exists recurring_rule_id uuid,
-  add column if not exists scheduled_for timestamptz;
+  add column if not exists scheduled_for timestamptz,
+  add column if not exists debt_id uuid;
+
+create table if not exists public.finance_salary_profiles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null unique references auth.users (id) on delete cascade,
+  gross_salary numeric(12, 2) not null check (gross_salary >= 0),
+  pay_frequency text not null check (pay_frequency in ('monthly', 'biweekly', 'weekly')),
+  bonuses numeric(12, 2) not null default 0 check (bonuses >= 0),
+  overtime_pay numeric(12, 2) not null default 0 check (overtime_pay >= 0),
+  other_income numeric(12, 2) not null default 0 check (other_income >= 0),
+  notes text not null default '',
+  allow_transaction_generation boolean not null default false,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.finance_salary_deductions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  type text not null check (type in ('fixed', 'percentage')),
+  value numeric(12, 4) not null check (value >= 0),
+  is_active boolean not null default true,
+  is_mandatory boolean not null default false,
+  frequency text not null check (frequency in ('per_period', 'monthly')),
+  notes text not null default '',
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.finance_debts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  type text not null check (type in ('loan', 'credit_card', 'mortgage', 'vehicle', 'service', 'personal', 'other')),
+  original_amount numeric(12, 2) not null check (original_amount >= 0),
+  pending_balance numeric(12, 2) not null check (pending_balance >= 0),
+  monthly_payment numeric(12, 2) not null check (monthly_payment >= 0),
+  interest_rate numeric(6, 3) check (interest_rate is null or interest_rate >= 0),
+  payment_day integer not null check (payment_day >= 1 and payment_day <= 31),
+  start_date date not null,
+  end_date date,
+  status text not null check (status in ('active', 'paid', 'paused', 'defaulted')),
+  priority text not null check (priority in ('low', 'medium', 'high', 'critical')),
+  notes text not null default '',
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create table if not exists public.finance_debt_payments (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  debt_id uuid not null references public.finance_debts (id) on delete cascade,
+  transaction_id uuid,
+  amount numeric(12, 2) not null check (amount >= 0),
+  payment_date date not null,
+  principal_amount numeric(12, 2) check (principal_amount is null or principal_amount >= 0),
+  interest_amount numeric(12, 2) check (interest_amount is null or interest_amount >= 0),
+  notes text not null default '',
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
 
 create table if not exists public.finance_recurring_rules (
   id uuid primary key default gen_random_uuid(),
@@ -76,15 +138,69 @@ begin
 end;
 $$;
 
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'finance_transactions_debt_id_fkey'
+  ) then
+    alter table public.finance_transactions
+      add constraint finance_transactions_debt_id_fkey
+      foreign key (debt_id) references public.finance_debts (id) on delete set null;
+  end if;
+end;
+$$;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'finance_debt_payments_transaction_id_fkey'
+  ) then
+    alter table public.finance_debt_payments
+      add constraint finance_debt_payments_transaction_id_fkey
+      foreign key (transaction_id) references public.finance_transactions (id) on delete set null;
+  end if;
+end;
+$$;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'finance_transactions_source_check'
+  ) then
+    alter table public.finance_transactions
+      add constraint finance_transactions_source_check
+      check (source in ('manual', 'recurring', 'debt_payment', 'salary_payment'));
+  end if;
+end;
+$$;
+
 create index if not exists finance_transactions_user_date_idx
 on public.finance_transactions (user_id, date desc, created_at desc);
 
 create index if not exists finance_transactions_recurring_idx
 on public.finance_transactions (user_id, source, scheduled_for desc);
 
+create index if not exists finance_transactions_debt_idx
+on public.finance_transactions (user_id, debt_id, date desc);
+
 create unique index if not exists finance_transactions_rule_schedule_key
 on public.finance_transactions (recurring_rule_id, scheduled_for)
 where recurring_rule_id is not null and scheduled_for is not null;
+
+create index if not exists finance_debts_user_status_day_idx
+on public.finance_debts (user_id, status, payment_day);
+
+create index if not exists finance_debt_payments_user_date_idx
+on public.finance_debt_payments (user_id, payment_date desc, created_at desc);
+
+create index if not exists finance_salary_deductions_user_active_idx
+on public.finance_salary_deductions (user_id, is_active, is_mandatory);
 
 create index if not exists finance_recurring_rules_user_next_run_idx
 on public.finance_recurring_rules (user_id, is_active, next_run_at);
@@ -321,6 +437,30 @@ before update on public.finance_transactions
 for each row
 execute function public.set_updated_at();
 
+drop trigger if exists set_finance_debts_updated_at on public.finance_debts;
+create trigger set_finance_debts_updated_at
+before update on public.finance_debts
+for each row
+execute function public.set_updated_at();
+
+drop trigger if exists set_finance_debt_payments_updated_at on public.finance_debt_payments;
+create trigger set_finance_debt_payments_updated_at
+before update on public.finance_debt_payments
+for each row
+execute function public.set_updated_at();
+
+drop trigger if exists set_finance_salary_profiles_updated_at on public.finance_salary_profiles;
+create trigger set_finance_salary_profiles_updated_at
+before update on public.finance_salary_profiles
+for each row
+execute function public.set_updated_at();
+
+drop trigger if exists set_finance_salary_deductions_updated_at on public.finance_salary_deductions;
+create trigger set_finance_salary_deductions_updated_at
+before update on public.finance_salary_deductions
+for each row
+execute function public.set_updated_at();
+
 drop trigger if exists set_finance_recurring_rules_updated_at on public.finance_recurring_rules;
 create trigger set_finance_recurring_rules_updated_at
 before update on public.finance_recurring_rules
@@ -336,6 +476,10 @@ execute function public.refresh_recurring_rule_next_run();
 
 alter table public.finance_settings enable row level security;
 alter table public.finance_transactions enable row level security;
+alter table public.finance_debts enable row level security;
+alter table public.finance_debt_payments enable row level security;
+alter table public.finance_salary_profiles enable row level security;
+alter table public.finance_salary_deductions enable row level security;
 alter table public.finance_recurring_rules enable row level security;
 
 drop policy if exists "Users can read their own finance settings" on public.finance_settings;
@@ -392,6 +536,122 @@ with check ((select auth.uid()) = user_id);
 drop policy if exists "Users can delete their own finance transactions" on public.finance_transactions;
 create policy "Users can delete their own finance transactions"
 on public.finance_transactions
+for delete
+to authenticated
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can read their own debts" on public.finance_debts;
+create policy "Users can read their own debts"
+on public.finance_debts
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can insert their own debts" on public.finance_debts;
+create policy "Users can insert their own debts"
+on public.finance_debts
+for insert
+to authenticated
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can update their own debts" on public.finance_debts;
+create policy "Users can update their own debts"
+on public.finance_debts
+for update
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can delete their own debts" on public.finance_debts;
+create policy "Users can delete their own debts"
+on public.finance_debts
+for delete
+to authenticated
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can read their own debt payments" on public.finance_debt_payments;
+create policy "Users can read their own debt payments"
+on public.finance_debt_payments
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can insert their own debt payments" on public.finance_debt_payments;
+create policy "Users can insert their own debt payments"
+on public.finance_debt_payments
+for insert
+to authenticated
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can update their own debt payments" on public.finance_debt_payments;
+create policy "Users can update their own debt payments"
+on public.finance_debt_payments
+for update
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can delete their own debt payments" on public.finance_debt_payments;
+create policy "Users can delete their own debt payments"
+on public.finance_debt_payments
+for delete
+to authenticated
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can read their own salary profile" on public.finance_salary_profiles;
+create policy "Users can read their own salary profile"
+on public.finance_salary_profiles
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can insert their own salary profile" on public.finance_salary_profiles;
+create policy "Users can insert their own salary profile"
+on public.finance_salary_profiles
+for insert
+to authenticated
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can update their own salary profile" on public.finance_salary_profiles;
+create policy "Users can update their own salary profile"
+on public.finance_salary_profiles
+for update
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can delete their own salary profile" on public.finance_salary_profiles;
+create policy "Users can delete their own salary profile"
+on public.finance_salary_profiles
+for delete
+to authenticated
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can read their own salary deductions" on public.finance_salary_deductions;
+create policy "Users can read their own salary deductions"
+on public.finance_salary_deductions
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can insert their own salary deductions" on public.finance_salary_deductions;
+create policy "Users can insert their own salary deductions"
+on public.finance_salary_deductions
+for insert
+to authenticated
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can update their own salary deductions" on public.finance_salary_deductions;
+create policy "Users can update their own salary deductions"
+on public.finance_salary_deductions
+for update
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can delete their own salary deductions" on public.finance_salary_deductions;
+create policy "Users can delete their own salary deductions"
+on public.finance_salary_deductions
 for delete
 to authenticated
 using ((select auth.uid()) = user_id);

@@ -7,7 +7,9 @@ import { PageIntro } from '@/components/ui/PageIntro'
 import { StatCard } from '@/components/ui/StatCard'
 import { BudgetOverviewCard } from '@/features/dashboard/components/BudgetOverviewCard'
 import { CategoryBreakdownList } from '@/features/dashboard/components/CategoryBreakdownList'
+import { FinancialOutlookCard } from '@/features/dashboard/components/FinancialOutlookCard'
 import { RecentTransactionsCard } from '@/features/dashboard/components/RecentTransactionsCard'
+import { UpcomingPaymentsCard } from '@/features/dashboard/components/UpcomingPaymentsCard'
 import { UpcomingRecurringCard } from '@/features/dashboard/components/UpcomingRecurringCard'
 import { useFinanceStore } from '@/hooks/useFinanceStore'
 import { formatCurrency, formatMonthLabel } from '@/utils/format'
@@ -28,7 +30,7 @@ export function DashboardPage() {
     <div className="space-y-8">
       <PageIntro
         action={
-          <Link className={buttonStyles({ size: 'lg' })} to="/registrar">
+          <Link className={`${buttonStyles({ size: 'lg' })} w-full sm:w-auto`} to="/registrar">
             Nuevo movimiento
           </Link>
         }
@@ -46,37 +48,53 @@ export function DashboardPage() {
           <div className="rounded-full bg-panel px-4 py-2 text-sm text-text-secondary">
             Programados activos: <span className="font-semibold text-text-primary">{selectors.activeAutomaticRulesCount}</span>
           </div>
+          <div className="rounded-full bg-panel px-4 py-2 text-sm text-text-secondary">
+            Deudas activas: <span className="font-semibold text-text-primary">{selectors.debtSummary.activeCount}</span>
+          </div>
         </div>
       </PageIntro>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          caption="Disponible despues de ingresos y gastos."
-          icon={Wallet}
-          title="Balance actual"
-          tone="brand"
-          value={formatCurrency(selectors.totals.balance, state.currency)}
-        />
-        <StatCard
-          caption="Total acreditado en tus registros."
-          icon={ArrowUpCircle}
-          title="Ingresos"
-          tone="success"
-          value={formatCurrency(selectors.totals.income, state.currency)}
-        />
-        <StatCard
-          caption="Total registrado como egreso."
-          icon={ArrowDownCircle}
-          title="Gastos"
-          tone="danger"
-          value={formatCurrency(selectors.totals.expenses, state.currency)}
-        />
-        <StatCard
-          caption="Consumo acumulado del periodo activo."
-          icon={CalendarDays}
-          title="Gasto mensual"
-          value={formatCurrency(selectors.currentMonthSummary.expenses, state.currency)}
-        />
+      <section className="grid gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="min-w-0">
+          <StatCard
+            caption="Disponible despues de ingresos y gastos."
+            icon={Wallet}
+            title="Balance actual"
+            tone="brand"
+            value={formatCurrency(selectors.totals.balance, state.currency)}
+          />
+        </div>
+        <div className="min-w-0">
+          <StatCard
+            caption="Total acreditado en tus registros."
+            icon={ArrowUpCircle}
+            title="Ingresos"
+            tone="success"
+            value={formatCurrency(selectors.totals.income, state.currency)}
+          />
+        </div>
+        <div className="min-w-0">
+          <StatCard
+            caption="Total registrado como egreso."
+            icon={ArrowDownCircle}
+            title="Gastos"
+            tone="danger"
+            value={formatCurrency(selectors.totals.expenses, state.currency)}
+          />
+        </div>
+        <div className="min-w-0">
+          <StatCard
+            caption="Consumo acumulado del periodo activo."
+            icon={CalendarDays}
+            title="Gasto mensual"
+            value={formatCurrency(selectors.currentMonthSummary.expenses, state.currency)}
+          />
+        </div>
+      </section>
+
+      <section className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
+        <FinancialOutlookCard currency={state.currency} outlook={selectors.financialOutlook} />
+        <UpcomingPaymentsCard currency={state.currency} payments={selectors.upcomingPayments} />
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">

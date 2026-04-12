@@ -1,20 +1,16 @@
 /* eslint-disable react-refresh/only-export-components */
 import { type Dispatch, type PropsWithChildren, createContext, useContext, useEffect, useReducer, useRef, useState } from 'react'
 
+import { financeReducer, type FinanceAction } from '@/app/providers/finance/financeReducer'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { useLocalStorageState } from '@/hooks/useLocalStorageState'
 import type {
   FinanceState,
   FinanceSyncState,
-  Filters,
-  MonthlyBudget,
-  RecurringRule,
   RemoteFinanceSnapshot,
-  ThemeMode,
-  Transaction,
 } from '@/types/finance'
 import { FINANCE_STORAGE_KEY } from '@/utils/constants'
-import { createDefaultBudget, createInitialFinanceState, createInitialFilters } from '@/utils/finance'
+import { createInitialFinanceState } from '@/utils/finance'
 import { deserializeFinanceState, serializeFinanceState } from '@/utils/storage'
 import {
   areRemoteSnapshotsEqual,
@@ -25,21 +21,6 @@ import {
   syncFinanceStateToSupabase,
 } from '@/utils/supabaseFinance'
 
-type FinanceAction =
-  | { type: 'ADD_TRANSACTION'; payload: Transaction }
-  | { type: 'UPDATE_TRANSACTION'; payload: Transaction }
-  | { type: 'DELETE_TRANSACTION'; payload: string }
-  | { type: 'ADD_RECURRING_RULE'; payload: RecurringRule }
-  | { type: 'UPDATE_RECURRING_RULE'; payload: RecurringRule }
-  | { type: 'DELETE_RECURRING_RULE'; payload: string }
-  | { type: 'SET_FILTERS'; payload: Partial<Filters> }
-  | { type: 'RESET_FILTERS' }
-  | { type: 'SET_THEME'; payload: ThemeMode }
-  | { type: 'SET_CURRENCY'; payload: string }
-  | { type: 'SET_MONTHLY_BUDGET'; payload: MonthlyBudget }
-  | { type: 'HYDRATE_STATE'; payload: FinanceState }
-  | { type: 'RESET_FINANCE_DATA' }
-
 const FinanceStateContext = createContext<FinanceState | null>(null)
 const FinanceDispatchContext = createContext<Dispatch<FinanceAction> | null>(null)
 const FinanceSyncContext = createContext<{
@@ -47,86 +28,6 @@ const FinanceSyncContext = createContext<{
   retrySync: () => void
   refreshRemoteData: () => void
 } | null>(null)
-
-function financeReducer(state: FinanceState, action: FinanceAction): FinanceState {
-  switch (action.type) {
-    case 'HYDRATE_STATE':
-      return action.payload
-    case 'ADD_TRANSACTION':
-      return {
-        ...state,
-        transactions: [...state.transactions, action.payload],
-      }
-    case 'UPDATE_TRANSACTION':
-      return {
-        ...state,
-        transactions: state.transactions.map((transaction) =>
-          transaction.id === action.payload.id ? action.payload : transaction,
-        ),
-      }
-    case 'DELETE_TRANSACTION':
-      return {
-        ...state,
-        transactions: state.transactions.filter((transaction) => transaction.id !== action.payload),
-      }
-    case 'ADD_RECURRING_RULE':
-      return {
-        ...state,
-        recurringRules: [...state.recurringRules, action.payload],
-      }
-    case 'UPDATE_RECURRING_RULE':
-      return {
-        ...state,
-        recurringRules: state.recurringRules.map((rule) => (rule.id === action.payload.id ? action.payload : rule)),
-      }
-    case 'DELETE_RECURRING_RULE':
-      return {
-        ...state,
-        recurringRules: state.recurringRules.filter((rule) => rule.id !== action.payload),
-      }
-    case 'SET_FILTERS':
-      return {
-        ...state,
-        filters: {
-          ...state.filters,
-          ...action.payload,
-        },
-      }
-    case 'RESET_FILTERS':
-      return {
-        ...state,
-        filters: createInitialFilters(),
-      }
-    case 'SET_THEME':
-      return {
-        ...state,
-        theme: action.payload,
-      }
-    case 'SET_CURRENCY':
-      return {
-        ...state,
-        currency: action.payload,
-      }
-    case 'SET_MONTHLY_BUDGET':
-      return {
-        ...state,
-        monthlyBudget: action.payload,
-      }
-    case 'RESET_FINANCE_DATA':
-      return {
-        ...createInitialFinanceState(),
-        theme: state.theme,
-        currency: state.currency,
-        monthlyBudget: {
-          ...createDefaultBudget(),
-          limit: state.monthlyBudget.limit,
-          warningThreshold: state.monthlyBudget.warningThreshold,
-        },
-      }
-    default:
-      return state
-  }
-}
 
 interface FinanceProviderProps extends PropsWithChildren {
   enableRemoteSync?: boolean
@@ -198,7 +99,7 @@ export function FinanceProvider({
         phase: 'loading',
         isConfigured: true,
         isAuthenticated: true,
-        message: 'Cargando tu informacion...',
+        message: 'Sincronizando tu cuenta...',
       })
 
       try {
@@ -221,7 +122,7 @@ export function FinanceProvider({
           phase: 'ready',
           isConfigured: true,
           isAuthenticated: true,
-          message: 'Datos al dia.',
+          message: 'Cuenta sincronizada y al dia.',
         })
       } catch (error) {
         if (!isActive) {
@@ -263,7 +164,7 @@ export function FinanceProvider({
           ...currentState,
           mode: 'supabase',
           phase: 'saving',
-          message: 'Guardando cambios...',
+          message: 'Guardando cambios en tu cuenta...',
         }))
 
         await syncFinanceStateToSupabase(lastSyncedSnapshotRef.current, remoteSnapshot, userId)
@@ -274,7 +175,7 @@ export function FinanceProvider({
           phase: 'ready',
           isConfigured: true,
           isAuthenticated: true,
-          message: 'Datos al dia.',
+          message: 'Cuenta sincronizada y al dia.',
         })
       })
       .catch((error) => {

@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { AlarmClock, ChartColumn, Gauge, PlusCircle, ReceiptText, Settings2 } from 'lucide-react'
+import { AlarmClock, BadgeDollarSign, ChartColumn, CreditCard, Gauge, PlusCircle, ReceiptText, Settings2 } from 'lucide-react'
 
 export interface NavigationItem {
   to: string
@@ -26,6 +26,18 @@ export const navigationItems: NavigationItem[] = [
     label: 'Programados',
     description: 'Configura ingresos y gastos automaticos.',
     icon: AlarmClock,
+  },
+  {
+    to: '/deudas',
+    label: 'Deudas',
+    description: 'Sigue saldos pendientes y registra pagos reales.',
+    icon: CreditCard,
+  },
+  {
+    to: '/salario',
+    label: 'Salario',
+    description: 'Calcula sueldo neto y administra descuentos.',
+    icon: BadgeDollarSign,
   },
   {
     to: '/historial',

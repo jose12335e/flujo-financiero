@@ -251,7 +251,7 @@ export function ScheduledPage() {
               <p className="text-sm leading-6 text-text-secondary">
                 Usa este control para forzar la revision de reglas vencidas y generar de inmediato los movimientos pendientes.
               </p>
-              <Button disabled={isProcessing} onClick={() => void handleProcessNow()} variant="secondary">
+              <Button className="w-full sm:w-auto" disabled={isProcessing} onClick={() => void handleProcessNow()} variant="secondary">
                 {isProcessing ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <AlarmClock className="h-4 w-4" />}
                 {isProcessing ? 'Procesando...' : 'Procesar automatizaciones ahora'}
               </Button>

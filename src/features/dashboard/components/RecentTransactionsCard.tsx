@@ -35,12 +35,12 @@ export function RecentTransactionsCard({ categories, currency, transactions }: R
 
   return (
     <Card className="h-full">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-text-muted">Actividad</p>
           <h2 className="mt-2 text-2xl font-bold tracking-tight text-text-primary">Actividad reciente</h2>
         </div>
-        <Link className={cn(buttonStyles({ variant: 'secondary', size: 'sm' }))} to="/historial">
+        <Link className={cn(buttonStyles({ variant: 'secondary', size: 'sm' }), 'w-full sm:w-auto')} to="/historial">
           Ver historial
         </Link>
       </div>
@@ -55,25 +55,25 @@ export function RecentTransactionsCard({ categories, currency, transactions }: R
               key={transaction.id}
               className="flex flex-col gap-3 rounded-[1.4rem] border border-outline bg-panel-muted p-4 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex min-w-0 items-center gap-3">
                 <div
                   className={cn(
-                    'flex h-11 w-11 items-center justify-center rounded-2xl',
+                    'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl',
                     isIncome ? 'bg-success-soft text-success' : 'bg-danger-soft text-danger',
                   )}
                 >
                   {isIncome ? <ArrowUpCircle className="h-5 w-5" /> : <ArrowDownCircle className="h-5 w-5" />}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-text-primary">
+                    <p className="truncate font-semibold text-text-primary">
                       {transaction.description || (isIncome ? 'Ingreso sin detalle' : 'Gasto sin detalle')}
                     </p>
                     {transaction.source === 'recurring' ? <Badge variant="brand">Programado</Badge> : null}
+                    {transaction.source === 'debt_payment' ? <Badge variant="warning">Pago de deuda</Badge> : null}
+                    {transaction.source === 'salary_payment' ? <Badge variant="success">Sueldo neto</Badge> : null}
                   </div>
-                  <p className="text-sm text-text-secondary">
-                    {category?.label ?? 'Categoria'} · {formatDisplayDate(transaction.date)}
-                  </p>
+                  <p className="text-sm text-text-secondary">{category?.label ?? 'Categoria'} · {formatDisplayDate(transaction.date)}</p>
                 </div>
               </div>
               <p className={cn('text-lg font-bold', isIncome ? 'text-success' : 'text-danger')}>
