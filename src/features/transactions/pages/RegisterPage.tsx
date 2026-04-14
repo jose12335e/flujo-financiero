@@ -1,9 +1,11 @@
 import { Edit3, Layers3, PlusCircle, TriangleAlert } from 'lucide-react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
+import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageIntro } from '@/components/ui/PageIntro'
+import type { RegisterPageDraftState } from '@/features/transaction-drafts/types/transactionDraft'
 import { useFinanceStore } from '@/hooks/useFinanceStore'
 import { TransactionForm } from '@/features/transactions/components/TransactionForm'
 import type { TransactionFormValues } from '@/types/finance'
@@ -12,10 +14,12 @@ import { getCategoriesByType } from '@/utils/finance'
 
 export function RegisterPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { transactionId } = useParams()
   const { actions, helpers, selectors, state } = useFinanceStore()
   const existingTransaction = transactionId ? helpers.getTransactionById(transactionId) : undefined
   const isEditing = Boolean(transactionId)
+  const draftState = location.state as RegisterPageDraftState | null
 
   if (transactionId && !existingTransaction) {
     return (
@@ -35,7 +39,7 @@ export function RegisterPage() {
         description: existingTransaction.description,
         date: existingTransaction.date,
       }
-    : undefined
+    : draftState?.draftValues
 
   const handleSubmit = (values: TransactionFormValues) => {
     const timestamp = new Date().toISOString()
@@ -69,7 +73,16 @@ export function RegisterPage() {
         description="Registra y actualiza movimientos con un flujo claro, rapido y conectado con el resto de la app."
         eyebrow={isEditing ? 'Editar movimiento' : 'Nuevo movimiento'}
         title={isEditing ? 'Actualiza un movimiento' : 'Registrar un movimiento'}
-      />
+      >
+        {!isEditing && draftState ? (
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="brand">Borrador IA</Badge>
+            <Badge variant="neutral">
+              Confianza {draftState.draftMeta.confidenceLabel === 'high' ? 'alta' : draftState.draftMeta.confidenceLabel === 'medium' ? 'media' : 'baja'}
+            </Badge>
+          </div>
+        ) : null}
+      </PageIntro>
 
       <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
         <Card>

@@ -32,6 +32,7 @@ supabase/       schema SQL para la base remota
 ## Scripts
 
 - `npm run dev`: entorno local
+- `npm run dev:server`: backend IA local con Gemini
 - `npm run build`: build de produccion
 - `npm run lint`: revision estatica
 - `npm run test:run`: suite de pruebas
@@ -40,10 +41,15 @@ supabase/       schema SQL para la base remota
 
 1. Copia `.env.example` a `.env`.
 2. Completa `VITE_SUPABASE_URL` y `VITE_SUPABASE_PUBLISHABLE_KEY`.
-3. Ejecuta el SQL de `supabase/schema.sql` en el SQL Editor de tu proyecto.
-4. En `Authentication > Providers`, deja activo `Email`.
-5. En `Authentication > URL Configuration`, agrega `http://127.0.0.1:5173` como `Site URL`.
-6. Reinicia `npm run dev`.
+3. Si vas a usar los modulos IA localmente, agrega tambien:
+   - `AI_GEMINI_API_KEY`
+   - `AI_GEMINI_MODEL=gemini-2.5-flash`
+4. Ejecuta el SQL de `supabase/schema.sql` en el SQL Editor de tu proyecto.
+5. En `Authentication > Providers`, deja activo `Email`.
+6. En `Authentication > URL Configuration`, agrega `http://127.0.0.1:5173` como `Site URL`.
+7. Para trabajar con IA en local, usa dos terminales:
+   - `npm run dev:server`
+   - `npm run dev`
 
 ## Lanzarla para otras personas
 
@@ -70,8 +76,24 @@ Agrega estas variables en el proyecto de Vercel:
 
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
+- `AI_GEMINI_API_KEY`
+- `AI_GEMINI_MODEL`
 
 Usa los mismos valores que ya probaste localmente.
+
+### 3.1 Backend IA en Vercel
+
+- Los endpoints IA viven bajo `/api/...`.
+- La configuracion actual ya deja pasar `/api` antes del fallback SPA.
+- Ejemplos que deben responder en produccion:
+  - `/api/health`
+  - `/api/ai/chat/message`
+  - `/api/ai/documents/analyze`
+  - `/api/ai/recommendations/generate`
+  - `/api/ai/insights/generate`
+  - `/api/ai/forecasting/generate`
+  - `/api/ai/transactions/classify`
+  - `/api/ai/transactions/organize`
 
 ### 4. Ajustar Supabase para produccion
 

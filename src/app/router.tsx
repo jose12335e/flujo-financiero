@@ -12,6 +12,14 @@ const RegisterPage = lazy(async () => ({
   default: (await import('@/features/transactions/pages/RegisterPage')).RegisterPage,
 }))
 
+const SmartRegisterPage = lazy(async () => ({
+  default: (await import('@/features/transaction-drafts/pages/SmartRegisterPage')).SmartRegisterPage,
+}))
+
+const TransactionOrganizationPage = lazy(async () => ({
+  default: (await import('@/features/transaction-organization/pages/TransactionOrganizationPage')).TransactionOrganizationPage,
+}))
+
 const ScheduledPage = lazy(async () => ({
   default: (await import('@/features/recurring/pages/ScheduledPage')).ScheduledPage,
 }))
@@ -22,6 +30,18 @@ const DebtsPage = lazy(async () => ({
 
 const SalaryPage = lazy(async () => ({
   default: (await import('@/features/salary/pages/SalaryPage')).SalaryPage,
+}))
+
+const ImportDocumentPage = lazy(async () => ({
+  default: (await import('@/features/documents/pages/ImportDocumentPage')).ImportDocumentPage,
+}))
+
+const FinancialChatPage = lazy(async () => ({
+  default: (await import('@/features/chat/pages/FinancialChatPage')).FinancialChatPage,
+}))
+
+const FinancialForecastPage = lazy(async () => ({
+  default: (await import('@/features/forecasting/pages/FinancialForecastPage')).FinancialForecastPage,
 }))
 
 const HistoryPage = lazy(async () => ({
@@ -80,10 +100,15 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: withSuspense(<DashboardPage />) },
       { path: 'registrar', element: withSuspense(<RegisterPage />) },
+      { path: 'registrar-inteligente', element: withSuspense(<SmartRegisterPage />) },
+      { path: 'clasificacion-ia', element: withSuspense(<TransactionOrganizationPage />) },
       { path: 'registrar/:transactionId', element: withSuspense(<RegisterPage />) },
       { path: 'programados', element: withSuspense(<ScheduledPage />) },
       { path: 'deudas', element: withSuspense(<DebtsPage />) },
       { path: 'salario', element: withSuspense(<SalaryPage />) },
+      { path: 'documentos', element: withSuspense(<ImportDocumentPage />) },
+      { path: 'asistente-ia', element: withSuspense(<FinancialChatPage />) },
+      { path: 'proyecciones-ia', element: withSuspense(<FinancialForecastPage />) },
       { path: 'historial', element: withSuspense(<HistoryPage />) },
       { path: 'reportes', element: withSuspense(<ReportsPage />) },
       { path: 'configuracion', element: withSuspense(<SettingsPage />) },

@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { AlarmClock, BadgeDollarSign, ChartColumn, CreditCard, Gauge, PlusCircle, ReceiptText, Settings2 } from 'lucide-react'
+import { AlarmClock, BadgeDollarSign, Bot, ChartColumn, CreditCard, FileUp, FolderTree, Gauge, LineChart, MessageSquareText, PlusCircle, ReceiptText, Settings2 } from 'lucide-react'
 
 export interface NavigationItem {
   to: string
@@ -22,6 +22,18 @@ export const navigationItems: NavigationItem[] = [
     icon: PlusCircle,
   },
   {
+    to: '/registrar-inteligente',
+    label: 'Registro IA',
+    description: 'Convierte texto libre en un borrador revisable antes de guardar.',
+    icon: Bot,
+  },
+  {
+    to: '/clasificacion-ia',
+    label: 'Clasificacion IA',
+    description: 'Detecta reclasificaciones, duplicados y gastos repetidos.',
+    icon: FolderTree,
+  },
+  {
     to: '/programados',
     label: 'Programados',
     description: 'Configura ingresos y gastos automaticos.',
@@ -38,6 +50,24 @@ export const navigationItems: NavigationItem[] = [
     label: 'Salario',
     description: 'Calcula sueldo neto y administra descuentos.',
     icon: BadgeDollarSign,
+  },
+  {
+    to: '/documentos',
+    label: 'Documentos',
+    description: 'Importa PDF e imagenes para extraer y revisar informacion.',
+    icon: FileUp,
+  },
+  {
+    to: '/asistente-ia',
+    label: 'Chat IA',
+    description: 'Pregunta por tus datos financieros y recibe respuestas guiadas.',
+    icon: MessageSquareText,
+  },
+  {
+    to: '/proyecciones-ia',
+    label: 'Proyecciones IA',
+    description: 'Simula escenarios de cierre, ahorro y deuda sin alterar tus datos.',
+    icon: LineChart,
   },
   {
     to: '/historial',

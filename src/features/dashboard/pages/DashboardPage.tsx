@@ -7,16 +7,22 @@ import { PageIntro } from '@/components/ui/PageIntro'
 import { StatCard } from '@/components/ui/StatCard'
 import { BudgetOverviewCard } from '@/features/dashboard/components/BudgetOverviewCard'
 import { CategoryBreakdownList } from '@/features/dashboard/components/CategoryBreakdownList'
+import { FinancialInsightsCard } from '@/features/dashboard/components/FinancialInsightsCard'
 import { FinancialOutlookCard } from '@/features/dashboard/components/FinancialOutlookCard'
+import { FinancialRecommendationsCard } from '@/features/dashboard/components/FinancialRecommendationsCard'
 import { RecentTransactionsCard } from '@/features/dashboard/components/RecentTransactionsCard'
 import { UpcomingPaymentsCard } from '@/features/dashboard/components/UpcomingPaymentsCard'
 import { UpcomingRecurringCard } from '@/features/dashboard/components/UpcomingRecurringCard'
+import { useFinancialInsights } from '@/features/insights/hooks/useFinancialInsights'
+import { useFinancialRecommendations } from '@/features/recommendations/hooks/useFinancialRecommendations'
 import { useFinanceStore } from '@/hooks/useFinanceStore'
 import { formatCurrency, formatMonthLabel } from '@/utils/format'
 import { calculateCategorySummary } from '@/utils/finance'
 
 export function DashboardPage() {
   const { selectors, state } = useFinanceStore()
+  const insightsState = useFinancialInsights()
+  const recommendationsState = useFinancialRecommendations()
   const currentMonthLabel = formatMonthLabel(selectors.currentMonthKey)
   const previousMonthKey = format(subMonths(parse(selectors.currentMonthKey, 'yyyy-MM', new Date()), 1), 'yyyy-MM')
   const previousMonthLabel = formatMonthLabel(previousMonthKey)
@@ -95,6 +101,14 @@ export function DashboardPage() {
       <section className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
         <FinancialOutlookCard currency={state.currency} outlook={selectors.financialOutlook} />
         <UpcomingPaymentsCard currency={state.currency} payments={selectors.upcomingPayments} />
+      </section>
+
+      <section>
+        <FinancialInsightsCard state={insightsState} />
+      </section>
+
+      <section>
+        <FinancialRecommendationsCard state={recommendationsState} />
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
