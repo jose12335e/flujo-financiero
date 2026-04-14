@@ -1,8 +1,20 @@
-import { app } from '../../../../server/app'
+import { handleChatRequest, methodNotAllowed } from '../../../../server/http/routeHandlers'
 
 export const config = {
   runtime: 'nodejs',
   maxDuration: 60,
 }
 
-export default app
+export default async function handler(
+  request: { method?: string; body?: unknown },
+  response: { status: (code: number) => { json: (payload: unknown) => void } },
+) {
+  if (request.method !== 'POST') {
+    const result = methodNotAllowed()
+    response.status(result.status).json(result.body)
+    return
+  }
+
+  const result = await handleChatRequest(request.body)
+  response.status(result.status).json(result.body)
+}
