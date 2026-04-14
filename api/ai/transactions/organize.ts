@@ -1,4 +1,4 @@
-import { handleTransactionOrganizationRequest, methodNotAllowed } from '../../../../server/http/routeHandlers'
+import { handleTransactionOrganizationRequest, methodNotAllowed } from '../../../../server/http/routeHandlers.js'
 
 export const config = {
   runtime: 'nodejs',

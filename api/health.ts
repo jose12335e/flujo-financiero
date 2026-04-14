@@ -1,4 +1,4 @@
-import { getHealthPayload } from '../server/http/routeHandlers'
+import { getHealthPayload } from '../server/http/routeHandlers.js'
 
 export const config = {
   runtime: 'nodejs',

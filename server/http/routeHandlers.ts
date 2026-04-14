@@ -18,7 +18,7 @@ import {
   recommendationsRequestSchema,
   transactionDraftRequestSchema,
   transactionOrganizationRequestSchema,
-} from './shared'
+} from './shared.js'
 
 type HandlerResult = {
   status: number
@@ -52,7 +52,7 @@ export async function handleDocumentRequest(body: unknown): Promise<HandlerResul
 
   const startedAt = Date.now()
   try {
-    const { analyzeDocumentWithGemini } = await import('../ai/documents/analyzeDocumentWithGemini')
+    const { analyzeDocumentWithGemini } = await import('../ai/documents/analyzeDocumentWithGemini.js')
     const result = await analyzeDocumentWithGemini(parsed.data)
     return {
       status: 200,
@@ -85,7 +85,7 @@ export async function handleChatRequest(body: unknown): Promise<HandlerResult> {
 
   const startedAt = Date.now()
   try {
-    const { generateFinancialChatWithGemini } = await import('../ai/chat/generateFinancialChatWithGemini')
+    const { generateFinancialChatWithGemini } = await import('../ai/chat/generateFinancialChatWithGemini.js')
     const result = await generateFinancialChatWithGemini(parsed.data)
     return {
       status: 200,
@@ -118,7 +118,7 @@ export async function handleRecommendationsRequest(body: unknown): Promise<Handl
 
   const startedAt = Date.now()
   try {
-    const { generateFinancialRecommendationsWithGemini } = await import('../ai/recommendations/generateFinancialRecommendationsWithGemini')
+    const { generateFinancialRecommendationsWithGemini } = await import('../ai/recommendations/generateFinancialRecommendationsWithGemini.js')
     const result = await generateFinancialRecommendationsWithGemini(parsed.data)
     return {
       status: 200,
@@ -151,7 +151,7 @@ export async function handleInsightsRequest(body: unknown): Promise<HandlerResul
 
   const startedAt = Date.now()
   try {
-    const { generateFinancialInsightsWithGemini } = await import('../ai/insights/generateFinancialInsightsWithGemini')
+    const { generateFinancialInsightsWithGemini } = await import('../ai/insights/generateFinancialInsightsWithGemini.js')
     const result = await generateFinancialInsightsWithGemini(parsed.data)
     return {
       status: 200,
@@ -184,7 +184,7 @@ export async function handleForecastRequest(body: unknown): Promise<HandlerResul
 
   const startedAt = Date.now()
   try {
-    const { generateFinancialForecastWithGemini } = await import('../ai/forecasting/generateFinancialForecastWithGemini')
+    const { generateFinancialForecastWithGemini } = await import('../ai/forecasting/generateFinancialForecastWithGemini.js')
     const result = await generateFinancialForecastWithGemini(parsed.data)
     return {
       status: 200,
@@ -217,7 +217,7 @@ export async function handleTransactionClassifierRequest(body: unknown): Promise
 
   const startedAt = Date.now()
   try {
-    const { classifyTransactionWithGemini } = await import('../ai/transactions/classifyTransactionWithGemini')
+    const { classifyTransactionWithGemini } = await import('../ai/transactions/classifyTransactionWithGemini.js')
     const result = await classifyTransactionWithGemini(parsed.data)
     return {
       status: 200,
@@ -250,7 +250,7 @@ export async function handleTransactionOrganizationRequest(body: unknown): Promi
 
   const startedAt = Date.now()
   try {
-    const { organizeTransactionsWithGemini } = await import('../ai/transactions/organizeTransactionsWithGemini')
+    const { organizeTransactionsWithGemini } = await import('../ai/transactions/organizeTransactionsWithGemini.js')
     const result = await organizeTransactionsWithGemini(parsed.data)
     return {
       status: 200,

@@ -1,4 +1,4 @@
-import { handleChatRequest, methodNotAllowed } from '../../../../server/http/routeHandlers'
+import { handleChatRequest, methodNotAllowed } from '../../../../server/http/routeHandlers.js'
 
 export const config = {
   runtime: 'nodejs',

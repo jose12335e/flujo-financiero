@@ -1,7 +1,7 @@
 import type { AiChatRequest, AiChatResult } from '../../../src/features/ai/contracts/aiContracts'
-import { generateGeminiJson } from '../gemini/geminiClient'
-import { buildFinancialChatPrompt } from './financialChatPrompt'
-import { financialChatSchema } from './financialChatSchema'
+import { generateGeminiJson } from '../gemini/geminiClient.js'
+import { buildFinancialChatPrompt } from './financialChatPrompt.js'
+import { financialChatSchema } from './financialChatSchema.js'
 
 export async function generateFinancialChatWithGemini(request: AiChatRequest) {
   return generateGeminiJson<AiChatResult>({

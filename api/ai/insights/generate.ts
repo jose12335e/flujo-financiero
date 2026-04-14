@@ -1,4 +1,4 @@
-import { handleInsightsRequest, methodNotAllowed } from '../../../../server/http/routeHandlers'
+import { handleInsightsRequest, methodNotAllowed } from '../../../../server/http/routeHandlers.js'
 
 export const config = {
   runtime: 'nodejs',

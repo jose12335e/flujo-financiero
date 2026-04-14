@@ -1,6 +1,6 @@
 import express from 'express'
 
-import { AI_SERVER_PORT } from './http/shared'
+import { AI_SERVER_PORT } from './http/shared.js'
 import {
   getHealthPayload,
   handleChatRequest,
@@ -10,7 +10,7 @@ import {
   handleRecommendationsRequest,
   handleTransactionClassifierRequest,
   handleTransactionOrganizationRequest,
-} from './http/routeHandlers'
+} from './http/routeHandlers.js'
 
 export { AI_SERVER_PORT }
 

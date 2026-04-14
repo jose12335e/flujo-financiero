@@ -1,4 +1,4 @@
-import { handleRecommendationsRequest, methodNotAllowed } from '../../../../server/http/routeHandlers'
+import { handleRecommendationsRequest, methodNotAllowed } from '../../../../server/http/routeHandlers.js'
 
 export const config = {
   runtime: 'nodejs',

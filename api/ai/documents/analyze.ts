@@ -1,4 +1,4 @@
-import { handleDocumentRequest, methodNotAllowed } from '../../../../server/http/routeHandlers'
+import { handleDocumentRequest, methodNotAllowed } from '../../../../server/http/routeHandlers.js'
 
 export const config = {
   runtime: 'nodejs',
